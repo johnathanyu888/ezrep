@@ -1,12 +1,15 @@
 # EZRep
 
-A dead-simple gym tracker. Log exercise, weight, reps, and (optionally) reps in reserve.
-EZRep estimates your 1-rep max and tells you what your next set should be for your goal.
+A dead-simple gym tracker. Tap **Track a set** and answer three full-screen questions:
+exercise, weight, reps. EZRep estimates your 1-rep max and tells you what your next set should be for your goal.
+
+- **One question at a time.** Typing the exercise auto-detects the muscles it works and highlights them on a 3D anatomy figure.
+- **Live effects.** Weight is compared to a rough average working weight and reps to an average lifter's 1RM, from blue "lighter than average" up to a red "way above average" with embers. Benchmarks are in [`norms.py`](norms.py).
 
 - **No account.** Everything is saved in your browser's localStorage. Use *Export backup* to keep a copy.
 - **Written in Python.** It runs in the browser with [PyScript](https://pyscript.net) (MicroPython), so there's no server to host.
-- **3D muscle map.** Each set you log credits the muscles that exercise works: 1 set for primary muscles, ½ for secondary. Sets with more than 3 RIR count as half. The goal is **2 sets per muscle**. Colors go grey (untouched) → yellow → orange → red (goal met) → dark red (4+). Drag to rotate, tap a muscle for its count. Exercises it doesn't recognize let you pick the muscles yourself.
-- **Calendar.** Day and Week views to look back at past workouts. The muscle map follows the selected day.
+- **3D muscle map.** Each set you log credits the muscles that exercise works: 1 set for primary muscles, ½ for secondary. The goal is **2 sets per muscle**. Colors go grey (untouched) → yellow → orange → red (goal met) → dark red (4+). Drag to rotate, tap a muscle for its count. Exercises it doesn't recognize let you pick the muscles yourself.
+- **Day view + calendar.** Swipe left/right (or use the arrows) to change days. The calendar button opens a month grid where you can jump to any day.
 - **Works on your phone.** Open the GitHub Pages URL, then use *Add to Home Screen*.
 
 ## How the coaching works
@@ -18,7 +21,7 @@ EZRep estimates your 1-rep max and tells you what your next set should be for yo
 | Hypertrophy   | 6–12      | 0 (failure)|
 | Endurance     | 12–20     | 1          |
 
-- **Est. 1RM**: Epley formula on reps to failure (reps + RIR).
+- **Est. 1RM**: Epley formula, assuming each logged set went close to failure.
 - **Set 1 is the freshest.** With no sets logged today, EZRep picks a weight from your recent best for the middle of your goal's rep range.
 - **Fatigue.** After set 1, it measures how much you've dropped from set to set today and projects the next set. It then subtracts your target RIR. If you'd fall below the rep range it lowers the weight, and if you're well above the range it raises it.
 
@@ -35,7 +38,7 @@ Then open http://localhost:8000.
 ## Tests
 
 ```
-python -m unittest test_coach test_muscles
+python -m unittest test_coach test_muscles test_norms
 ```
 
 ## Put it on your phone (GitHub Pages)

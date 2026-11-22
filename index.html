@@ -22,90 +22,126 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header class="top">
-    <select id="goal" aria-label="Training goal">
-      <option value="explosive">Explosiveness</option>
-      <option value="strength">Strength</option>
-      <option value="hypertrophy">Hypertrophy</option>
-      <option value="endurance">Endurance</option>
-    </select>
-    <button id="unit" class="chip" type="button" title="Switch units">lb</button>
-  </header>
-
   <p id="loading" class="loading">Loading…</p>
 
   <main id="app" hidden>
-    <section class="card">
-      <h2>Log a set</h2>
-      <form id="logForm" autocomplete="off">
-        <label class="full">Exercise
-          <input id="exercise" list="exerciseList" placeholder="e.g. Bench Press" required>
-          <datalist id="exerciseList"></datalist>
-        </label>
-        <div class="full musclesLine" id="musclesLine"></div>
-        <div class="full picker" id="musclePicker" hidden></div>
-        <label><span>Weight (<span class="unitLabel">lb</span>)</span>
-          <input id="weight" type="number" inputmode="decimal" min="0" step="any" required>
-        </label>
-        <label>Reps
-          <input id="reps" type="number" inputmode="numeric" min="1" step="1" required>
-        </label>
-        <label>RIR (opt.)
-          <input id="rir" type="number" inputmode="numeric" min="0" max="10" step="1" placeholder="0">
-        </label>
-        <button type="submit" class="primary">Log set</button>
-      </form>
-      <p class="hint">RIR = reps in reserve: how many more clean reps you had left. Leave it blank if you went to failure.</p>
-    </section>
+    <header class="top">
+      <select id="goal" aria-label="Training goal">
+        <option value="explosive">Explosiveness</option>
+        <option value="strength">Strength</option>
+        <option value="hypertrophy">Hypertrophy</option>
+        <option value="endurance">Endurance</option>
+      </select>
+      <button id="unit" class="chip" type="button" title="Switch units">lb</button>
+    </header>
 
-    <section class="card" id="coach" hidden>
-      <h2 id="coachTitle">Coach</h2>
-      <div class="stats">
-        <div class="stat"><span class="label">Est. 1RM</span><span class="value" id="e1rm">–</span></div>
-        <div class="stat"><span class="label">Sets today</span><span class="value" id="setCount">0</span></div>
-        <div class="stat"><span class="label">Target RIR</span><span class="value" id="targetRir">–</span></div>
+    <button id="trackBtn" class="track" type="button"><span>+</span> Track a set</button>
+
+    <section class="day" id="dayPanel">
+      <div class="dateBar">
+        <button type="button" class="navBtn" id="prevDay" aria-label="Previous day">&lsaquo;</button>
+        <div class="dateLabel">
+          <strong id="dateMain">Today</strong>
+          <small id="dateSub"></small>
+        </div>
+        <button type="button" class="navBtn" id="nextDay" aria-label="Next day">&rsaquo;</button>
+        <button type="button" class="navBtn cal" id="calBtn" aria-label="Open calendar">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+        </button>
       </div>
-      <div class="next" id="nextSet"></div>
-      <p class="hint" id="coachNote"></p>
-    </section>
-
-    <section class="card">
-      <h2>Muscle tension <span class="sub" id="mapDate"></span></h2>
-      <div id="body3d" class="body3d" data-muscles="{}"></div>
-      <p class="hint center" id="muscleInfo">Drag to rotate. Tap a muscle to see its sets.</p>
-      <div class="legend">
-        <span><i style="background:#5c5c5c"></i>0</span>
-        <span><i style="background:#fde047"></i>&lt;1</span>
-        <span><i style="background:#f97316"></i>1</span>
-        <span><i style="background:#ef4444"></i>2 (goal)</span>
-        <span><i style="background:#991b1b"></i>4+</span>
+      <div class="dayScroll" id="dayScroll">
+        <div class="body3d" id="dayModel" data-info="dayInfo" data-muscles="{}"></div>
+        <p class="hint center" id="dayInfo">Drag to rotate · tap a muscle · swipe to change day</p>
+        <div class="legend">
+          <span><i style="background:#5c5c5c"></i>0</span>
+          <span><i style="background:#fde047"></i>&lt;1</span>
+          <span><i style="background:#f97316"></i>1</span>
+          <span><i style="background:#ef4444"></i>2 (goal)</span>
+          <span><i style="background:#991b1b"></i>4+</span>
+        </div>
+        <div class="muscleList" id="muscleList"></div>
+        <div id="daySets"></div>
       </div>
-      <div class="muscleList" id="muscleList"></div>
     </section>
+  </main>
 
-    <section class="card">
+  <!-- Full-screen, one-question-at-a-time set tracker -->
+  <div class="overlay wizard" id="wizard" hidden>
+    <div class="fxLayer" id="fxLayer" aria-hidden="true"></div>
+    <div class="wizTop">
+      <button type="button" class="navBtn" id="wizBack" aria-label="Back">&lsaquo;</button>
+      <div class="dots" id="wizDots"><i></i><i></i><i></i></div>
+      <button type="button" class="navBtn" id="wizClose" aria-label="Close">&times;</button>
+    </div>
+
+    <div class="step" id="step0">
+      <p class="qnum">Question 1 of 3</p>
+      <h1>What exercise did you do?</h1>
+      <input id="wExercise" class="bigInput" placeholder="e.g. Bench Press" autocomplete="off" enterkeyhint="next">
+      <div class="recent" id="wRecent"></div>
+      <p class="sublabel" id="wMusclesLabel"></p>
+      <div class="picker" id="wMuscles"></div>
+      <div class="body3d wizModel" id="wizModel" data-muscles="{}"></div>
+      <button type="button" class="primary" id="wConfirm0">Confirm</button>
+    </div>
+
+    <div class="step" id="step1" hidden>
+      <p class="qnum">Question 2 of 3 · <span id="wEx1"></span></p>
+      <h1>How much weight?</h1>
+      <div class="numRow">
+        <button type="button" class="adj" data-adj="-1" aria-label="Less">&minus;</button>
+        <div class="numBox"><input id="wWeight" class="bigNum" type="number" inputmode="decimal" min="0" step="any" enterkeyhint="next"><span class="unitLabel">lb</span></div>
+        <button type="button" class="adj" data-adj="1" aria-label="More">+</button>
+      </div>
+      <div class="verdictBox" id="wVerdict1"></div>
+      <button type="button" class="coachChip" id="wCoach" hidden></button>
+      <button type="button" class="primary" id="wConfirm1">Confirm</button>
+    </div>
+
+    <div class="step" id="step2" hidden>
+      <p class="qnum">Question 3 of 3 · <span id="wEx2"></span></p>
+      <h1>How many reps?</h1>
+      <div class="numRow">
+        <button type="button" class="adj" data-adj="-1" aria-label="Fewer">&minus;</button>
+        <div class="numBox"><input id="wReps" class="bigNum" type="number" inputmode="numeric" min="1" step="1" enterkeyhint="done"><span>reps</span></div>
+        <button type="button" class="adj" data-adj="1" aria-label="More">+</button>
+      </div>
+      <div class="verdictBox" id="wVerdict2"></div>
+      <button type="button" class="primary" id="wSave">Save set</button>
+    </div>
+
+    <div class="step done" id="step3" hidden>
+      <div class="check">&#10003;</div>
+      <h1 id="doneTitle">Set logged!</h1>
+      <p class="doneSub" id="doneSub"></p>
+      <div class="nextCard" id="doneNext"></div>
+      <div class="muscleList center" id="doneMuscles"></div>
+      <button type="button" class="primary" id="wAgain">Log another set</button>
+      <button type="button" class="ghost wide" id="wDone">Done</button>
+    </div>
+  </div>
+
+  <!-- Month calendar sheet -->
+  <div class="overlay sheet" id="calendar" hidden>
+    <div class="sheetInner">
       <div class="calHead">
-        <div class="seg" role="tablist">
-          <button type="button" id="modeDay" class="on">Day</button>
-          <button type="button" id="modeWeek">Week</button>
-        </div>
-        <div class="calNav">
-          <button type="button" class="chip" id="calPrev" aria-label="Previous">&lsaquo;</button>
-          <button type="button" class="chip" id="calToday">Today</button>
-          <button type="button" class="chip" id="calNext" aria-label="Next">&rsaquo;</button>
-        </div>
+        <button type="button" class="navBtn" id="calPrev" aria-label="Previous month">&lsaquo;</button>
+        <strong id="calMonth"></strong>
+        <button type="button" class="navBtn" id="calNext" aria-label="Next month">&rsaquo;</button>
+        <button type="button" class="navBtn" id="calClose" aria-label="Close">&times;</button>
       </div>
-      <h3 class="calTitle" id="calTitle"></h3>
-      <div id="calBody"></div>
+      <div class="calGrid calDow"><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span></div>
+      <div class="calGrid" id="calGrid"></div>
+      <button type="button" class="ghost wide" id="calToday">Jump to today</button>
       <div class="tools">
         <button id="exportBtn" class="ghost" type="button">Export backup</button>
         <button id="clearBtn" class="ghost danger" type="button">Clear all</button>
       </div>
-      <p class="hint">Your data is saved only in this browser (localStorage), with no account. Use Export to back it up.</p>
-    </section>
-  </main>
+      <p class="hint">Your data is saved only in this browser (localStorage), with no account.</p>
+    </div>
+  </div>
 
   <script type="module" src="body3d.js"></script>
-  <script type="mpy" src="main.py" config='{"files": {"./coach.py": "./coach.py", "./muscles.py": "./muscles.py"}}'></script>
+  <script type="mpy" src="main.py" config='{"files": {"./coach.py": "./coach.py", "./muscles.py": "./muscles.py", "./norms.py": "./norms.py"}}'></script>
 </body>
 </html>
