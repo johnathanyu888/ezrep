@@ -404,7 +404,7 @@ def render_week():
     counts = {}
     for s in STATE["sets"]:
         counts[s["date"]] = counts.get(s["date"], 0) + 1
-    cells = ['<span class="dow">%s</span>' % d[0] for d in MON_FIRST]
+    cells = []
     start = add_days(VIEW["anchor"], -7)
     for i in range(14):
         d = add_days(start, i)
@@ -417,14 +417,28 @@ def render_week():
             cls += " today"
         if d in counts:
             cls += " has"
+        if i % 7 == 0:
+            cls += " wk"  # snap point at the start of each week
         future = d > t
-        cells.append('<button type="button" class="%s" data-day="%s"%s>%d<i></i></button>'
-                     % (cls, d, " disabled" if future else "", jsdate(d).getDate()))
-    q("#biweek").innerHTML = "".join(cells)
+        cells.append('<button type="button" class="%s" data-day="%s"%s>'
+                     '<span class="bdow">%s</span><span class="bnum">%d</span><i></i></button>'
+                     % (cls, d, " disabled" if future else "", MON_FIRST[i % 7], jsdate(d).getDate()))
+    strip = q("#biweek")
+    strip.innerHTML = "".join(cells)
+    position_strip()
 
     # Weekly muscle model: goal is 2 sets per muscle per week.
     totals = muscles.tension(sets_in_week(ws), STATE["custom"])
     q("#dayModel").setAttribute("data-muscles", json.dumps(muscles.body_data(totals)))
+
+
+def position_strip():
+    """Scroll the 2-week strip so the selected day's week is showing
+    (the later week is on the right)."""
+    strip = q("#biweek")
+    strip.style.scrollBehavior = "auto"
+    strip.scrollLeft = strip.scrollWidth if week_start(VIEW["date"]) == VIEW["anchor"] else 0
+    strip.style.scrollBehavior = ""
 
 
 def render_day():
@@ -509,8 +523,8 @@ SWIPE = {"x": None, "y": None}
 
 @when("pointerdown", "#dayPanel")
 def on_swipe_start(event):
-    if event.target.closest(".body3d") is not None:
-        SWIPE["x"] = None
+    if event.target.closest(".body3d,.biweek") is not None:
+        SWIPE["x"] = None  # the model rotates and the strip scrolls on its own
         return
     SWIPE["x"] = event.clientX
     SWIPE["y"] = event.clientY
@@ -601,10 +615,14 @@ def render_calendar():
             cls += " today"
         if ds == VIEW["date"]:
             cls += " sel"
-        badge = '<em>%d</em>' % counts[ds] if ds in counts else ""
+        badge = "<em></em>" if ds in counts else ""
         cells.append('<button type="button" class="%s" data-cal="%s"%s>%d%s</button>'
                      % (cls, ds, " disabled" if ds > t else "", d, badge))
     q("#calGrid").innerHTML = "".join(cells)
+    prefix = "%04d-%02d" % (y, m)
+    days_trained = len([d for d in counts if d.startswith(prefix)])
+    n_sets = sum(n for d, n in counts.items() if d.startswith(prefix))
+    q("#calStats").innerText = "%s · %s this month" % (plural(days_trained, "workout"), plural(n_sets, "set"))
     ty = int(t[:4])
     tm = int(t[5:7])
     q("#calNext").disabled = (y, m) >= (ty, tm)
@@ -987,6 +1005,7 @@ def close_wizard():
     VIEW["date"] = today_str()
     VIEW["anchor"] = week_start(VIEW["date"])
     render_main()
+    position_strip()
 
 
 @when("click", "#trackBtn")
@@ -1386,3 +1405,4 @@ window.setInterval(create_proxy(tick), 250)
 document.addEventListener("visibilitychange", create_proxy(on_visible))
 q("#loading").hidden = True
 q("#app").hidden = False
+position_strip()  # needs the strip to be visible to measure it
