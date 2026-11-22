@@ -1,5 +1,7 @@
 # EZRep
 
+**Live:** https://ezrep-fawn.vercel.app
+
 A dead-simple gym tracker. Tap **Track a set** and answer three full-screen questions:
 exercise, weight, reps. EZRep estimates your 1-rep max and tells you what your next set should be for your goal.
 
@@ -65,7 +67,7 @@ iPhone, add it to your Home Screen so Safari doesn't clear site data for apps yo
 
 It's a static site with no server or build step. Deploy it on **Vercel**: sign in at vercel.com with
 GitHub → *Add New → Project* → import `ezrep` → *Deploy* (framework preset: *Other*, no build command).
-You get a URL like `https://ezrep.vercel.app`, and every push to `main` redeploys automatically.
+It's deployed at https://ezrep-fawn.vercel.app, and every push to `main` redeploys automatically.
 GitHub Pages (*Settings → Pages → main / root*) works too.
 
 ## Credits
