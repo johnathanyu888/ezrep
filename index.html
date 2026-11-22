@@ -4,29 +4,32 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>EZRep</title>
-  <meta name="theme-color" content="#111418">
+  <meta name="theme-color" content="#0b0b0b">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="EZRep">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icon.svg">
+  <script type="importmap">
+    {"imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }}
+  </script>
   <link rel="stylesheet" href="https://pyscript.net/releases/2024.11.1/core.css">
   <script type="module" src="https://pyscript.net/releases/2024.11.1/core.js"></script>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header class="top">
-    <h1>EZ<span>Rep</span></h1>
-    <div class="settings">
-      <select id="goal" aria-label="Training goal">
-        <option value="explosive">Explosiveness</option>
-        <option value="strength">Strength</option>
-        <option value="hypertrophy">Hypertrophy</option>
-        <option value="endurance">Endurance</option>
-      </select>
-      <button id="unit" class="chip" type="button" title="Switch units">lb</button>
-    </div>
+    <select id="goal" aria-label="Training goal">
+      <option value="explosive">Explosiveness</option>
+      <option value="strength">Strength</option>
+      <option value="hypertrophy">Hypertrophy</option>
+      <option value="endurance">Endurance</option>
+    </select>
+    <button id="unit" class="chip" type="button" title="Switch units">lb</button>
   </header>
 
   <p id="loading" class="loading">Loading…</p>
@@ -39,6 +42,8 @@
           <input id="exercise" list="exerciseList" placeholder="e.g. Bench Press" required>
           <datalist id="exerciseList"></datalist>
         </label>
+        <div class="full musclesLine" id="musclesLine"></div>
+        <div class="full picker" id="musclePicker" hidden></div>
         <label><span>Weight (<span class="unitLabel">lb</span>)</span>
           <input id="weight" type="number" inputmode="decimal" min="0" step="any" required>
         </label>
@@ -65,13 +70,33 @@
     </section>
 
     <section class="card">
-      <h2>Today</h2>
-      <div id="today"></div>
+      <h2>Muscle tension <span class="sub" id="mapDate"></span></h2>
+      <div id="body3d" class="body3d" data-muscles="{}"></div>
+      <p class="hint center" id="muscleInfo">Drag to rotate. Tap a muscle to see its sets.</p>
+      <div class="legend">
+        <span><i style="background:#5c5c5c"></i>0</span>
+        <span><i style="background:#fde047"></i>&lt;1</span>
+        <span><i style="background:#f97316"></i>1</span>
+        <span><i style="background:#ef4444"></i>2 (goal)</span>
+        <span><i style="background:#991b1b"></i>4+</span>
+      </div>
+      <div class="muscleList" id="muscleList"></div>
     </section>
 
     <section class="card">
-      <h2>History</h2>
-      <div id="history"></div>
+      <div class="calHead">
+        <div class="seg" role="tablist">
+          <button type="button" id="modeDay" class="on">Day</button>
+          <button type="button" id="modeWeek">Week</button>
+        </div>
+        <div class="calNav">
+          <button type="button" class="chip" id="calPrev" aria-label="Previous">&lsaquo;</button>
+          <button type="button" class="chip" id="calToday">Today</button>
+          <button type="button" class="chip" id="calNext" aria-label="Next">&rsaquo;</button>
+        </div>
+      </div>
+      <h3 class="calTitle" id="calTitle"></h3>
+      <div id="calBody"></div>
       <div class="tools">
         <button id="exportBtn" class="ghost" type="button">Export backup</button>
         <button id="clearBtn" class="ghost danger" type="button">Clear all</button>
@@ -80,6 +105,7 @@
     </section>
   </main>
 
-  <script type="mpy" src="main.py" config='{"files": {"./coach.py": "./coach.py"}}'></script>
+  <script type="module" src="body3d.js"></script>
+  <script type="mpy" src="main.py" config='{"files": {"./coach.py": "./coach.py", "./muscles.py": "./muscles.py"}}'></script>
 </body>
 </html>

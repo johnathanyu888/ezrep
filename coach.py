@@ -179,6 +179,13 @@ def recommend(sets, today, goal, unit):
             w = new_w
             reason += " Drop the weight to stay in the %d-%d rep range." % (lo, hi)
         reps = int(math.floor(reps_at(projected, w) - target_rir))
+        # Plate rounding can land just too heavy; step down until in range.
+        step = 2.5 if unit == "kg" else 5.0
+        tries = 0
+        while reps < lo and w - step > 0 and tries < 10:
+            w -= step
+            reps = int(math.floor(reps_at(projected, w) - target_rir))
+            tries += 1
     elif reps > hi + 2:
         new_w = round_weight(weight_for(projected, hi + target_rir), unit)
         if new_w > w:

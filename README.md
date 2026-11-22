@@ -5,6 +5,8 @@ EZRep estimates your 1-rep max and tells you what your next set should be for yo
 
 - **No account.** Everything is saved in your browser's localStorage. Use *Export backup* to keep a copy.
 - **Written in Python.** It runs in the browser with [PyScript](https://pyscript.net) (MicroPython), so there's no server to host.
+- **3D muscle map.** Each set you log credits the muscles that exercise works: 1 set for primary muscles, ½ for secondary. Sets with more than 3 RIR count as half. The goal is **2 sets per muscle**. Colors go grey (untouched) → yellow → orange → red (goal met) → dark red (4+). Drag to rotate, tap a muscle for its count. Exercises it doesn't recognize let you pick the muscles yourself.
+- **Calendar.** Day and Week views to look back at past workouts. The muscle map follows the selected day.
 - **Works on your phone.** Open the GitHub Pages URL, then use *Add to Home Screen*.
 
 ## How the coaching works
@@ -20,7 +22,7 @@ EZRep estimates your 1-rep max and tells you what your next set should be for yo
 - **Set 1 is the freshest.** With no sets logged today, EZRep picks a weight from your recent best for the middle of your goal's rep range.
 - **Fatigue.** After set 1, it measures how much you've dropped from set to set today and projects the next set. It then subtracts your target RIR. If you'd fall below the rep range it lowers the weight, and if you're well above the range it raises it.
 
-All the math is in [`coach.py`](coach.py). The UI is in [`main.py`](main.py).
+Training math is in [`coach.py`](coach.py), exercise→muscle mapping in [`muscles.py`](muscles.py), and the UI in [`main.py`](main.py). The only JavaScript is [`body3d.js`](body3d.js), which renders the 3D model with three.js. Python decides the colors.
 
 ## Run locally
 
@@ -33,7 +35,7 @@ Then open http://localhost:8000.
 ## Tests
 
 ```
-python -m unittest test_coach
+python -m unittest test_coach test_muscles
 ```
 
 ## Put it on your phone (GitHub Pages)
