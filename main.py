@@ -264,16 +264,12 @@ def queue_items():
 
 
 def render_queue():
-    t = today_str()
     items = queue_items()
-    q("#queueTitle").innerText = "Up next · %s" % LONG_DAYS[jsdate(t).getDay()]
+    # No routine today: hide the row entirely to keep the top clean.
+    q("#queue").hidden = not items
     if not items:
-        q("#queueRow").innerHTML = (
-            '<p class="empty small">No routine for today. '
-            '<button type="button" class="link" data-act="routine">Set one up</button></p>'
-        )
         return
-    chips = []
+    chips = ['<span class="qlabel">Up next</span>']
     for it in items:
         finished = it["done"] >= it["target"]
         chips.append(
@@ -429,9 +425,6 @@ def render_week():
     # Weekly muscle model: goal is 2 sets per muscle per week.
     totals = muscles.tension(sets_in_week(ws), STATE["custom"])
     q("#dayModel").setAttribute("data-muscles", json.dumps(muscles.body_data(totals)))
-    q("#muscleList").innerHTML = muscle_chips(totals)
-    todo = [label for mid, label in muscles.MUSCLES if totals.get(mid, 0) < muscles.GOAL_SETS]
-    q("#todoMuscles").innerText = ("Still to hit this week: " + ", ".join(todo)) if todo else "Every muscle hit its goal this week!"
 
 
 def render_day():
@@ -769,15 +762,19 @@ def tick(*args):
     progress = min(1.0, elapsed / target) if target else 1.0
     done = running and elapsed >= target
 
-    # Full-screen ring
-    q("#bigRing").style.strokeDashoffset = str(RING_BIG * (1 - progress))
-    q("#timerTime").innerText = mmss(elapsed)
+    remaining = max(0, target - elapsed)
+    # Ring starts full and empties as the rest counts down.
+    left_frac = 1 - progress
+    q("#bigRing").style.strokeDashoffset = str(RING_BIG * (1 - left_frac))
+    # Round up so a 3:00 rest shows 3:00 at the start and 0:00 only at the end.
+    shown = int(remaining) + (1 if remaining > int(remaining) else 0)
+    q("#timerTime").innerText = "Go!" if done else mmss(shown)
     if not running:
-        sub = "Ready · rest %s" % mmss(target)
+        sub = "Ready"
     elif done:
-        sub = "Time for your next set! (+%s)" % mmss(elapsed - target)
+        sub = "Time for your next set · +%s" % mmss(elapsed - target)
     else:
-        sub = "%s left" % mmss(target - elapsed)
+        sub = "of %s rest" % mmss(target)
     q("#timerSub").innerText = sub
     q("#timerTarget").innerText = mmss(target)
     q("#timerStart").innerText = "Restart" if running else "Start"
@@ -791,9 +788,9 @@ def tick(*args):
     # Mini bar on the main screen
     bar = q("#timerBar")
     bar.hidden = not running
-    q("#miniRing").style.strokeDashoffset = str(RING_MINI * (1 - progress))
-    q("#miniTime").innerText = mmss(elapsed)
-    q("#miniTarget").innerText = "Go!" if done else "/ " + mmss(target)
+    q("#miniRing").style.strokeDashoffset = str(RING_MINI * (1 - left_frac))
+    q("#miniTime").innerText = "Go!" if done else mmss(shown)
+    q("#miniTarget").innerText = "+" + mmss(elapsed - target) if done else "rest"
     if done:
         bar.classList.add("ringDone")
     else:
@@ -803,8 +800,8 @@ def tick(*args):
     rest = q("#doneRest")
     if running and WIZ["step"] == 4:
         rest.hidden = False
-        rest.innerHTML = ("<b>%s</b> rested · %s" % (mmss(elapsed), "go for your next set!" if done
-                          else "%s to go" % mmss(target - elapsed)))
+        rest.innerHTML = ("Rest over · go for your next set!" if done
+                          else "Rest <b>%s</b> left" % mmss(shown))
         if done:
             rest.classList.add("ringDone")
         else:

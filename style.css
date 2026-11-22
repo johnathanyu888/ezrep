@@ -107,7 +107,8 @@ ol { list-style: none; margin: 0; padding: 0; }
 .trackRow { display: flex; gap: 8px; flex: none; }
 .trackRow .track { flex: 1; }
 .squareBtn { width: 60px; flex: none; background: var(--card); border: 1px solid var(--line-strong); padding: 0; }
-.queue { flex: none; margin-top: 12px; }
+.queue { flex: none; margin-top: 10px; }
+.qlabel { flex: none; align-self: center; font-size: .72rem; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; padding-right: 2px; }
 .queueHead { display: flex; justify-content: space-between; align-items: baseline; font-size: .8rem; color: var(--muted); margin-bottom: 6px; }
 .queueRow { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
 .queueRow::-webkit-scrollbar { display: none; }

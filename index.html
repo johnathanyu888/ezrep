@@ -30,6 +30,7 @@
     <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></symbol>
     <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></symbol>
     <symbol id="i-cal" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="1"/><path d="M3 10h18M8 3v4M16 3v4"/></g></symbol>
+    <symbol id="i-list" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
     <symbol id="i-timer" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/></g></symbol>
     <symbol id="i-fire" viewBox="0 0 24 24"><path d="M12 2.5c.6 3.2 3 4.9 4.6 7.2 1 1.4 1.6 3 1.6 4.8A6.2 6.2 0 0 1 12 21a6.2 6.2 0 0 1-6.2-6.5c0-2.3 1-4.2 2.6-5.6.1 1.9.9 3.2 2.2 3.8-.3-3.6.3-6.9 1.4-10.2z" fill="currentColor"/></symbol>
   </svg>
@@ -39,14 +40,11 @@
   <main id="app" hidden>
     <div class="trackRow">
       <button id="trackBtn" class="track" type="button"><svg width="22" height="22"><use href="#i-plus"/></svg><span>Track a set</span></button>
+      <button id="routineBtn" class="squareBtn" type="button" aria-label="Weekly routine"><svg width="24" height="24"><use href="#i-list"/></svg></button>
       <button id="timerBtn" class="squareBtn" type="button" aria-label="Rest timer"><svg width="24" height="24"><use href="#i-timer"/></svg></button>
     </div>
 
-    <section class="queue" id="queue">
-      <div class="queueHead">
-        <span id="queueTitle">Up next</span>
-        <button type="button" class="link" id="routineBtn">Edit routine</button>
-      </div>
+    <section class="queue" id="queue" hidden>
       <div class="queueRow" id="queueRow"></div>
     </section>
 
@@ -63,7 +61,7 @@
       <div class="biweek" id="biweek"></div>
       <div class="dayScroll" id="dayScroll">
         <div class="body3d" id="dayModel" data-info="dayInfo" data-muscles="{}"></div>
-        <p class="hint center" id="dayInfo">This week's sets per muscle · goal 2 each · tap a muscle</p>
+        <p class="hint center" id="dayInfo">Sets this week · goal 2 per muscle · tap a muscle</p>
         <div class="legend">
           <span><i style="background:#5c5c5c"></i>0</span>
           <span><i style="background:#fde047"></i>&lt;1</span>
@@ -71,8 +69,6 @@
           <span><i style="background:#ef4444"></i>2 (goal)</span>
           <span><i style="background:#991b1b"></i>4+</span>
         </div>
-        <div class="muscleList center" id="muscleList"></div>
-        <p class="todo center" id="todoMuscles"></p>
         <h3 class="dayHead" id="dayHead"></h3>
         <div id="daySets"></div>
       </div>
@@ -192,7 +188,6 @@
       <button type="button" class="primary" id="timerStart">Start</button>
       <button type="button" class="ghost wide" id="timerStop">Stop</button>
     </div>
-    <p class="hint center">Keep the app open for the alarm. Phones pause web pages in the background, but the time stays correct when you come back.</p>
   </div>
 
   <!-- Weekly routine -->
