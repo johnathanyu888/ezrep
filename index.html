@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>EZRep</title>
+  <meta name="theme-color" content="#111418">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="EZRep">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <link rel="stylesheet" href="https://pyscript.net/releases/2024.11.1/core.css">
+  <script type="module" src="https://pyscript.net/releases/2024.11.1/core.js"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="top">
+    <h1>EZ<span>Rep</span></h1>
+    <div class="settings">
+      <select id="goal" aria-label="Training goal">
+        <option value="explosive">Explosiveness</option>
+        <option value="strength">Strength</option>
+        <option value="hypertrophy">Hypertrophy</option>
+        <option value="endurance">Endurance</option>
+      </select>
+      <button id="unit" class="chip" type="button" title="Switch units">lb</button>
+    </div>
+  </header>
+
+  <p id="loading" class="loading">Loading…</p>
+
+  <main id="app" hidden>
+    <section class="card">
+      <h2>Log a set</h2>
+      <form id="logForm" autocomplete="off">
+        <label class="full">Exercise
+          <input id="exercise" list="exerciseList" placeholder="e.g. Bench Press" required>
+          <datalist id="exerciseList"></datalist>
+        </label>
+        <label><span>Weight (<span class="unitLabel">lb</span>)</span>
+          <input id="weight" type="number" inputmode="decimal" min="0" step="any" required>
+        </label>
+        <label>Reps
+          <input id="reps" type="number" inputmode="numeric" min="1" step="1" required>
+        </label>
+        <label>RIR (opt.)
+          <input id="rir" type="number" inputmode="numeric" min="0" max="10" step="1" placeholder="0">
+        </label>
+        <button type="submit" class="primary">Log set</button>
+      </form>
+      <p class="hint">RIR = reps in reserve: how many more clean reps you had left. Leave it blank if you went to failure.</p>
+    </section>
+
+    <section class="card" id="coach" hidden>
+      <h2 id="coachTitle">Coach</h2>
+      <div class="stats">
+        <div class="stat"><span class="label">Est. 1RM</span><span class="value" id="e1rm">–</span></div>
+        <div class="stat"><span class="label">Sets today</span><span class="value" id="setCount">0</span></div>
+        <div class="stat"><span class="label">Target RIR</span><span class="value" id="targetRir">–</span></div>
+      </div>
+      <div class="next" id="nextSet"></div>
+      <p class="hint" id="coachNote"></p>
+    </section>
+
+    <section class="card">
+      <h2>Today</h2>
+      <div id="today"></div>
+    </section>
+
+    <section class="card">
+      <h2>History</h2>
+      <div id="history"></div>
+      <div class="tools">
+        <button id="exportBtn" class="ghost" type="button">Export backup</button>
+        <button id="clearBtn" class="ghost danger" type="button">Clear all</button>
+      </div>
+      <p class="hint">Your data is saved only in this browser (localStorage), with no account. Use Export to back it up.</p>
+    </section>
+  </main>
+
+  <script type="mpy" src="main.py" config='{"files": {"./coach.py": "./coach.py"}}'></script>
+</body>
+</html>
