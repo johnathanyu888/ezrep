@@ -165,10 +165,11 @@ def recommend(sets, today, goal, unit):
         last = todays[-1]
         projected = set_e1rm(last) * (1 - rate)
         w = float(last["weight"])
-        reason = "Set %d: about %d%% weaker than set 1 because of fatigue." % (
-            n + 1,
-            round(100 * (1 - projected / one_rm)) if one_rm else 0,
-        )
+        drop = round(100 * (1 - projected / one_rm)) if one_rm else 0
+        if drop >= 1:
+            reason = "Set %d: about %d%% weaker than set 1 because of fatigue." % (n + 1, drop)
+        else:
+            reason = "Set %d: you're holding up well, no real drop from set 1 yet." % (n + 1)
 
     reps = int(math.floor(reps_at(projected, w) - target_rir))
 
