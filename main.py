@@ -36,6 +36,17 @@ def save_state():
 
 
 STATE = load_state()
+# The goal picker was removed from the UI; coach advice uses hypertrophy.
+STATE["goal"] = "hypertrophy"
+
+
+def keep_storage():
+    """Ask the browser not to evict our localStorage (e.g. Safari's 7-day rule)."""
+    try:
+        if window.navigator.storage and window.navigator.storage.persist:
+            window.navigator.storage.persist()
+    except Exception:
+        pass
 
 
 # ---------- helpers ----------
@@ -194,10 +205,8 @@ def muscle_chips(totals, only=None):
 # ---------- main screen: day view ----------
 
 def render_settings():
-    q("#unit").innerText = unit()
-    for el in document.querySelectorAll(".unitLabel"):
-        el.innerText = unit()
-    q("#goal").value = STATE["goal"]
+    for b in document.querySelectorAll(".unitSwitch button"):
+        b.className = "on" if b.getAttribute("data-unit") == unit() else ""
 
 
 def render_day():
@@ -288,17 +297,23 @@ def on_day_click(event):
     render_day()
 
 
-@when("change", "#goal")
-def on_goal(event):
-    STATE["goal"] = q("#goal").value
-    save_state()
-
-
-@when("click", "#unit")
+@when("click", ".unitSwitch")
 def on_unit(event):
-    STATE["unit"] = "kg" if unit() == "lb" else "lb"
+    b = event.target.closest("[data-unit]")
+    if b is None:
+        return
+    new = b.getAttribute("data-unit")
+    old = unit()
+    if new == old:
+        return
+    inp = q("#wWeight")
+    w = parse_num(inp.value)
+    if w:
+        inp.value = fmt(coach.round_weight(coach.to_unit(coach.from_unit(w, old), new), new))
+    STATE["unit"] = new
     save_state()
     render_settings()
+    render_step1()
     render_day()
 
 
@@ -512,7 +527,7 @@ def render_step0():
     worked = muscles.muscles_for(name, STATE["custom"]) if name else {}
     data = {}
     for mid, w in worked.items():
-        data[mid] = {"color": "#3ddc97" if w >= 1 else "#1d8a5c", "glow": True,
+        data[mid] = {"color": "#f5f5f5" if w >= 1 else "#a3a3a3", "glow": True,
                      "label": muscles.MUSCLE_NAMES[mid]}
     q("#wizModel").setAttribute("data-muscles", json.dumps(data))
     q("#wizModel").hidden = not name
@@ -804,6 +819,7 @@ def on_wiz_key(event):
 
 # ---------- start ----------
 
+keep_storage()
 build_embers()
 render_settings()
 render_day()

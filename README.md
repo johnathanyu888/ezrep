@@ -25,7 +25,7 @@ exercise, weight, reps. EZRep estimates your 1-rep max and tells you what your n
 - **Set 1 is the freshest.** With no sets logged today, EZRep picks a weight from your recent best for the middle of your goal's rep range.
 - **Fatigue.** After set 1, it measures how much you've dropped from set to set today and projects the next set. It then subtracts your target RIR. If you'd fall below the rep range it lowers the weight, and if you're well above the range it raises it.
 
-Training math is in [`coach.py`](coach.py), exercise→muscle mapping in [`muscles.py`](muscles.py), and the UI in [`main.py`](main.py). The only JavaScript is [`body3d.js`](body3d.js), which renders the 3D model with three.js. Python decides the colors.
+Training math is in [`coach.py`](coach.py), exercise→muscle mapping in [`muscles.py`](muscles.py), and the UI in [`main.py`](main.py). The only JavaScript is [`body3d.js`](body3d.js), which renders the 3D anatomy model with three.js. Python decides the colors.
 
 ## Run locally
 
@@ -41,7 +41,22 @@ Then open http://localhost:8000.
 python -m unittest test_coach test_muscles test_norms
 ```
 
-## Put it on your phone (GitHub Pages)
+## Your data
 
-Repo → **Settings → Pages** → Source: *Deploy from a branch* → Branch: `main` / root → Save.
-After a minute it's live at `https://<user>.github.io/ezrep/`.
+Everything is saved in your browser's localStorage on that device. It stays there between visits, so
+there's nothing to download each day. EZRep also asks the browser to keep the storage persistent. On
+iPhone, add it to your Home Screen so Safari doesn't clear site data for apps you haven't opened in a while.
+*Export backup* (in the calendar sheet) is only a safety copy. Data doesn't sync between devices.
+
+## Hosting
+
+It's a static site with no server or build step. Deploy it on **Vercel**: sign in at vercel.com with
+GitHub → *Add New → Project* → import `ezrep` → *Deploy* (framework preset: *Other*, no build command).
+You get a URL like `https://ezrep.vercel.app`, and every push to `main` redeploys automatically.
+GitHub Pages (*Settings → Pages → main / root*) works too.
+
+## Credits
+
+The 3D muscle model is from [Z-Anatomy](https://github.com/Z-Anatomy/Models-of-human-anatomy) /
+BodyParts3D © DBCLS, via [hoik-muscle-model](https://github.com/kalibismail/hoik-muscle-model),
+licensed [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). See [CREDITS.md](CREDITS.md).
