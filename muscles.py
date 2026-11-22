@@ -4,7 +4,7 @@ Pure Python (runs in MicroPython in the browser and in CPython for tests).
 
 Each set gives its primary muscles 1 set and its secondary muscles 0.5.
 A set with more than 3 reps in reserve is too easy to count fully, so it
-counts as half. The goal is GOAL_SETS hard sets per muscle per day.
+counts as half. The goal is GOAL_SETS hard sets per muscle per week.
 """
 
 GOAL_SETS = 2
@@ -74,12 +74,79 @@ def detect(exercise_name):
     return {}
 
 
+# ---------- exercise database (free-exercise-db, public domain) ----------
+# Each entry: (display name, lowercase name, word list, {muscle: weight})
+DB = []
+DB_BY_NAME = {}
+
+
+def _words(text):
+    out = []
+    word = ""
+    for ch in text.lower():
+        if ch.isalpha() or ch.isdigit():
+            word += ch
+        else:
+            if word:
+                out.append(word)
+            word = ""
+    if word:
+        out.append(word)
+    return out
+
+
+def load_db(entries):
+    """entries: list of [name, {muscle_id: weight}] (data/exercises.json)."""
+    del DB[:]
+    DB_BY_NAME.clear()
+    for name, muscles in entries:
+        item = (name, name.lower(), _words(name), dict(muscles))
+        DB.append(item)
+        DB_BY_NAME[name.lower()] = item
+
+
+def _token_match(query_words, item_words):
+    """Every typed word must start some word in the exercise name."""
+    for qw in query_words:
+        hit = False
+        for w in item_words:
+            if w.startswith(qw):
+                hit = True
+                break
+        if not hit:
+            return False
+    return True
+
+
+def db_search(query, limit=8):
+    """Database names matching the typed text, shortest (most generic) first."""
+    qw = _words(query)
+    if not qw:
+        return []
+    hits = [item for item in DB if _token_match(qw, item[2])]
+    hits.sort(key=lambda it: (len(it[0]), it[0]))
+    return [it[0] for it in hits[:limit]]
+
+
+def db_lookup(name):
+    item = DB_BY_NAME.get(name.strip().lower())
+    return dict(item[3]) if item else None
+
+
 def muscles_for(exercise_name, custom):
-    """User-chosen muscles win over auto-detection."""
+    """Muscles an exercise works. Priority: your own picks, an exact database
+    match, the built-in keyword rules, then the closest database match."""
     k = exercise_name.strip().lower()
     if k in custom:
         return dict(custom[k])
-    return detect(exercise_name)
+    exact = db_lookup(exercise_name)
+    if exact:
+        return exact
+    rules = detect(exercise_name)
+    if rules:
+        return rules
+    close = db_search(exercise_name, 1)
+    return db_lookup(close[0]) if close else {}
 
 
 def set_credit(rir):

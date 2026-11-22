@@ -22,27 +22,48 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <!-- Icon sprite -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="i-left" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-right" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></symbol>
+    <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></symbol>
+    <symbol id="i-cal" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="1"/><path d="M3 10h18M8 3v4M16 3v4"/></g></symbol>
+    <symbol id="i-timer" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/></g></symbol>
+    <symbol id="i-fire" viewBox="0 0 24 24"><path d="M12 2.5c.6 3.2 3 4.9 4.6 7.2 1 1.4 1.6 3 1.6 4.8A6.2 6.2 0 0 1 12 21a6.2 6.2 0 0 1-6.2-6.5c0-2.3 1-4.2 2.6-5.6.1 1.9.9 3.2 2.2 3.8-.3-3.6.3-6.9 1.4-10.2z" fill="currentColor"/></symbol>
+  </svg>
+
   <p id="loading" class="loading">Loading…</p>
 
   <main id="app" hidden>
+    <div class="trackRow">
+      <button id="trackBtn" class="track" type="button"><svg width="22" height="22"><use href="#i-plus"/></svg><span>Track a set</span></button>
+      <button id="timerBtn" class="squareBtn" type="button" aria-label="Rest timer"><svg width="24" height="24"><use href="#i-timer"/></svg></button>
+    </div>
 
-    <button id="trackBtn" class="track" type="button"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg><span>Track a set</span></button>
+    <section class="queue" id="queue">
+      <div class="queueHead">
+        <span id="queueTitle">Up next</span>
+        <button type="button" class="link" id="routineBtn">Edit routine</button>
+      </div>
+      <div class="queueRow" id="queueRow"></div>
+    </section>
 
     <section class="day" id="dayPanel">
       <div class="dateBar">
-        <button type="button" class="navBtn" id="prevDay" aria-label="Previous day"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+        <button type="button" class="navBtn" id="prevWeek" aria-label="Previous week"><svg width="22" height="22"><use href="#i-left"/></svg></button>
         <div class="dateLabel">
-          <strong id="dateMain">Today</strong>
-          <small id="dateSub"></small>
+          <strong id="weekMain">This week</strong>
+          <small id="weekSub"></small>
         </div>
-        <button type="button" class="navBtn" id="nextDay" aria-label="Next day"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
-        <button type="button" class="navBtn cal" id="calBtn" aria-label="Open calendar">
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
-        </button>
+        <button type="button" class="navBtn" id="nextWeek" aria-label="Next week"><svg width="22" height="22"><use href="#i-right"/></svg></button>
+        <button type="button" class="navBtn" id="calBtn" aria-label="Open calendar"><svg width="20" height="20"><use href="#i-cal"/></svg></button>
       </div>
+      <div class="biweek" id="biweek"></div>
       <div class="dayScroll" id="dayScroll">
         <div class="body3d" id="dayModel" data-info="dayInfo" data-muscles="{}"></div>
-        <p class="hint center" id="dayInfo">Drag to rotate · tap a muscle · swipe to change day</p>
+        <p class="hint center" id="dayInfo">This week's sets per muscle · goal 2 each · tap a muscle</p>
         <div class="legend">
           <span><i style="background:#5c5c5c"></i>0</span>
           <span><i style="background:#fde047"></i>&lt;1</span>
@@ -50,23 +71,30 @@
           <span><i style="background:#ef4444"></i>2 (goal)</span>
           <span><i style="background:#991b1b"></i>4+</span>
         </div>
-        <div class="muscleList" id="muscleList"></div>
+        <div class="muscleList center" id="muscleList"></div>
+        <p class="todo center" id="todoMuscles"></p>
+        <h3 class="dayHead" id="dayHead"></h3>
         <div id="daySets"></div>
       </div>
     </section>
+
+    <button type="button" class="timerBar" id="timerBar" hidden>
+      <svg viewBox="0 0 40 40" width="30" height="30"><circle cx="20" cy="20" r="16" class="ringBg"/><circle cx="20" cy="20" r="16" class="ringFg" id="miniRing"/></svg>
+      <span id="miniTime">0:00</span><small id="miniTarget"></small>
+    </button>
   </main>
 
   <!-- Full-screen, one-question-at-a-time set tracker -->
   <div class="overlay wizard" id="wizard" hidden>
     <div class="fxLayer" id="fxLayer" aria-hidden="true"></div>
     <div class="wizTop">
-      <button type="button" class="navBtn" id="wizBack" aria-label="Back"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
-      <div class="dots" id="wizDots"><i></i><i></i><i></i></div>
-      <button type="button" class="navBtn" id="wizClose" aria-label="Close"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+      <button type="button" class="navBtn" id="wizBack" aria-label="Back"><svg width="22" height="22"><use href="#i-left"/></svg></button>
+      <div class="dots" id="wizDots"><i></i><i></i><i></i><i></i></div>
+      <button type="button" class="navBtn" id="wizClose" aria-label="Close"><svg width="20" height="20"><use href="#i-x"/></svg></button>
     </div>
 
     <div class="step" id="step0">
-      <p class="qnum">Question 1 of 3</p>
+      <p class="qnum">Question 1 of 4</p>
       <h1>What exercise did you do?</h1>
       <input id="wExercise" class="bigInput" placeholder="e.g. Bench Press" autocomplete="off" enterkeyhint="next">
       <div class="recent" id="wRecent"></div>
@@ -77,12 +105,12 @@
     </div>
 
     <div class="step" id="step1" hidden>
-      <p class="qnum">Question 2 of 3 · <span id="wEx1"></span></p>
+      <p class="qnum">Question 2 of 4 · <span id="wEx1"></span></p>
       <h1>How much weight?</h1>
       <div class="numRow">
-        <button type="button" class="adj" data-adj="-1" aria-label="Less"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14"/></svg></button>
+        <button type="button" class="adj" data-adj="-1" aria-label="Less"><svg width="26" height="26"><use href="#i-minus"/></svg></button>
         <div class="numBox"><input id="wWeight" class="bigNum" type="number" inputmode="decimal" min="0" step="any" enterkeyhint="next"></div>
-        <button type="button" class="adj" data-adj="1" aria-label="More"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+        <button type="button" class="adj" data-adj="1" aria-label="More"><svg width="26" height="26"><use href="#i-plus"/></svg></button>
       </div>
       <div class="unitSwitch" role="group" aria-label="Units"><button type="button" data-unit="lb">lb</button><button type="button" data-unit="kg">kg</button></div>
       <div class="verdictBox" id="wVerdict1"></div>
@@ -91,25 +119,97 @@
     </div>
 
     <div class="step" id="step2" hidden>
-      <p class="qnum">Question 3 of 3 · <span id="wEx2"></span></p>
+      <p class="qnum">Question 3 of 4 · <span id="wEx2"></span></p>
       <h1>How many reps?</h1>
       <div class="numRow">
-        <button type="button" class="adj" data-adj="-1" aria-label="Fewer"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14"/></svg></button>
-        <div class="numBox"><input id="wReps" class="bigNum" type="number" inputmode="numeric" min="1" step="1" enterkeyhint="done"><span>reps</span></div>
-        <button type="button" class="adj" data-adj="1" aria-label="More"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+        <button type="button" class="adj" data-adj="-1" aria-label="Fewer"><svg width="26" height="26"><use href="#i-minus"/></svg></button>
+        <div class="numBox"><input id="wReps" class="bigNum" type="number" inputmode="numeric" min="1" step="1" enterkeyhint="next"><span>reps</span></div>
+        <button type="button" class="adj" data-adj="1" aria-label="More"><svg width="26" height="26"><use href="#i-plus"/></svg></button>
       </div>
       <div class="verdictBox" id="wVerdict2"></div>
-      <button type="button" class="primary" id="wSave">Save set</button>
+      <button type="button" class="primary" id="wConfirm2">Confirm</button>
     </div>
 
-    <div class="step done" id="step3" hidden>
+    <div class="step" id="step3" hidden>
+      <p class="qnum">Question 4 of 4 · <span id="wEx3"></span></p>
+      <h1>How hard was that set?</h1>
+      <div class="fires" id="wFires">
+        <button type="button" data-fire="1" aria-label="1 of 5"><svg><use href="#i-fire"/></svg></button>
+        <button type="button" data-fire="2" aria-label="2 of 5"><svg><use href="#i-fire"/></svg></button>
+        <button type="button" data-fire="3" aria-label="3 of 5"><svg><use href="#i-fire"/></svg></button>
+        <button type="button" data-fire="4" aria-label="4 of 5"><svg><use href="#i-fire"/></svg></button>
+        <button type="button" data-fire="5" aria-label="5 of 5"><svg><use href="#i-fire"/></svg></button>
+      </div>
+      <p class="fireLabel" id="wFireLabel">Tap the fires</p>
+      <p class="vSub center" id="wFireSub">How close to failure did you get? This tunes your next set.</p>
+      <button type="button" class="primary" id="wSave">Save set</button>
+      <button type="button" class="ghost wide" id="wSkipRate">Skip rating</button>
+    </div>
+
+    <div class="step done" id="step4" hidden>
       <div class="check">&#10003;</div>
       <h1 id="doneTitle">Set logged!</h1>
       <p class="doneSub" id="doneSub"></p>
       <div class="nextCard" id="doneNext"></div>
+      <button type="button" class="restCard" id="doneRest" hidden></button>
       <div class="muscleList center" id="doneMuscles"></div>
       <button type="button" class="primary" id="wAgain">Log another set</button>
+      <button type="button" class="ghost wide" id="wNextEx" hidden></button>
       <button type="button" class="ghost wide" id="wDone">Done</button>
+    </div>
+  </div>
+
+  <!-- Rest timer -->
+  <div class="overlay timerSheet" id="timer" hidden>
+    <div class="wizTop">
+      <span class="sheetTitle">Rest timer</span>
+      <button type="button" class="navBtn" id="timerClose" aria-label="Close"><svg width="20" height="20"><use href="#i-x"/></svg></button>
+    </div>
+    <div class="ringWrap" id="ringWrap">
+      <svg viewBox="0 0 240 240" class="bigRing">
+        <circle cx="120" cy="120" r="100" class="ringBg"/>
+        <circle cx="120" cy="120" r="100" class="ringFg" id="bigRing"/>
+      </svg>
+      <div class="ringText">
+        <strong id="timerTime">0:00</strong>
+        <span id="timerSub">Ready</span>
+      </div>
+    </div>
+    <div class="timerAdj">
+      <button type="button" class="ghost" data-tadj="-15">&minus;15s</button>
+      <span id="timerTarget">1:30</span>
+      <button type="button" class="ghost" data-tadj="15">+15s</button>
+    </div>
+    <div class="presets" id="timerPresets">
+      <button type="button" data-preset="60">1:00</button>
+      <button type="button" data-preset="90">1:30</button>
+      <button type="button" data-preset="120">2:00</button>
+      <button type="button" data-preset="180">3:00</button>
+      <button type="button" data-preset="300">5:00</button>
+    </div>
+    <label class="toggle"><input type="checkbox" id="timerAuto"> Start automatically after each set</label>
+    <div class="timerActions">
+      <button type="button" class="primary" id="timerStart">Start</button>
+      <button type="button" class="ghost wide" id="timerStop">Stop</button>
+    </div>
+    <p class="hint center">Keep the app open for the alarm. Phones pause web pages in the background, but the time stays correct when you come back.</p>
+  </div>
+
+  <!-- Weekly routine -->
+  <div class="overlay sheet" id="routine" hidden>
+    <div class="sheetInner tall">
+      <div class="calHead">
+        <strong>Weekly routine</strong>
+        <button type="button" class="navBtn" id="routineClose" aria-label="Close"><svg width="20" height="20"><use href="#i-x"/></svg></button>
+      </div>
+      <div class="dayTabs" id="routineTabs"></div>
+      <div class="routineList" id="routineList"></div>
+      <div class="addRow">
+        <input id="routineInput" placeholder="Add exercise…" autocomplete="off" list="routineSuggest">
+        <datalist id="routineSuggest"></datalist>
+        <button type="button" class="primary small" id="routineAdd">Add</button>
+      </div>
+      <p class="hint">These show up in <b>Up next</b> on that day. Tap one there to log it; you fill in the weight and reps.</p>
     </div>
   </div>
 
@@ -117,10 +217,10 @@
   <div class="overlay sheet" id="calendar" hidden>
     <div class="sheetInner">
       <div class="calHead">
-        <button type="button" class="navBtn" id="calPrev" aria-label="Previous month"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+        <button type="button" class="navBtn" id="calPrev" aria-label="Previous month"><svg width="22" height="22"><use href="#i-left"/></svg></button>
         <strong id="calMonth"></strong>
-        <button type="button" class="navBtn" id="calNext" aria-label="Next month"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
-        <button type="button" class="navBtn" id="calClose" aria-label="Close"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+        <button type="button" class="navBtn" id="calNext" aria-label="Next month"><svg width="22" height="22"><use href="#i-right"/></svg></button>
+        <button type="button" class="navBtn" id="calClose" aria-label="Close"><svg width="20" height="20"><use href="#i-x"/></svg></button>
       </div>
       <div class="calGrid calDow"><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span></div>
       <div class="calGrid" id="calGrid"></div>
@@ -130,11 +230,11 @@
         <button id="clearBtn" class="ghost danger" type="button">Clear all</button>
       </div>
       <p class="hint">Your data is saved in this browser and stays between visits; no account needed. Export a backup now and then in case you clear your browser data.</p>
-      <p class="hint credit">3D model: <a href="https://github.com/Z-Anatomy/Models-of-human-anatomy" target="_blank" rel="noopener">Z-Anatomy</a> / BodyParts3D © DBCLS, <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a>.</p>
+      <p class="hint credit">3D model: <a href="https://github.com/Z-Anatomy/Models-of-human-anatomy" target="_blank" rel="noopener">Z-Anatomy</a> / BodyParts3D © DBCLS, <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a>. Exercises: <a href="https://github.com/yuhonas/free-exercise-db" target="_blank" rel="noopener">free-exercise-db</a> (public domain).</p>
     </div>
   </div>
 
   <script type="module" src="body3d.js"></script>
-  <script type="mpy" src="main.py" config='{"files": {"./coach.py": "./coach.py", "./muscles.py": "./muscles.py", "./norms.py": "./norms.py"}}'></script>
+  <script type="mpy" src="main.py" config='{"files": {"./coach.py": "./coach.py", "./muscles.py": "./muscles.py", "./norms.py": "./norms.py", "./data/exercises.json": "./data/exercises.json"}}'></script>
 </body>
 </html>

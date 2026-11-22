@@ -36,5 +36,33 @@ class MuscleTests(unittest.TestCase):
         self.assertEqual(muscles.color_for(10), "#991b1b")
 
 
+class DatabaseTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        import json
+        with open("data/exercises.json", encoding="utf-8") as f:
+            muscles.load_db(json.load(f))
+
+    @classmethod
+    def tearDownClass(cls):
+        muscles.load_db([])
+
+    def test_exact_lookup(self):
+        m = muscles.muscles_for("Side Lateral Raise", {})
+        self.assertEqual(m, {"side_delts": 1.0})
+
+    def test_search(self):
+        hits = muscles.db_search("lat raise")
+        self.assertTrue(any("Lateral Raise" in h for h in hits))
+        self.assertEqual(muscles.db_search(""), [])
+
+    def test_rules_beat_fuzzy(self):
+        self.assertEqual(muscles.muscles_for("Bench Press", {})["chest"], 1.0)
+
+    def test_fuzzy_fallback(self):
+        m = muscles.muscles_for("Russian Twist", {})
+        self.assertIn("obliques", m)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -19,6 +19,14 @@ original materials were removed. See its README for the full list.
 The model file is distributed here under **CC BY-SA 4.0**. EZRep recolors the
 model at runtime; the file itself is unchanged.
 
+## Exercise database (`data/exercises.json`)
+
+Built by `tools/build_exercises.py` from
+[free-exercise-db](https://github.com/yuhonas/free-exercise-db) by yuhonas,
+released into the public domain ([Unlicense](https://unlicense.org)). Only names
+and primary/secondary muscles are kept, mapped onto EZRep's 16 muscle groups.
+Stretching and cardio entries are left out.
+
 ## Libraries
 
 - [three.js](https://threejs.org) (MIT), loaded from jsDelivr.

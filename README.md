@@ -12,6 +12,19 @@ exercise, weight, reps. EZRep estimates your 1-rep max and tells you what your n
 - **Day view + calendar.** Swipe left/right (or use the arrows) to change days. The calendar button opens a month grid where you can jump to any day.
 - **Works on your phone.** Open the GitHub Pages URL, then use *Add to Home Screen*.
 
+## Features
+
+- **Track a set** in 4 full-screen questions: exercise, weight, reps, and **how hard it was** (1-5 fires).
+  The fire rating becomes reps in reserve (5 = failure, 4 = 1 left, 3 = 2 left, 2 = 3 left, 1 = 5+ left),
+  which tunes the 1RM estimate and the next set's weight and reps.
+- **800+ exercises.** Typing searches a public-domain exercise database ([free-exercise-db](https://github.com/yuhonas/free-exercise-db))
+  and fills in primary and secondary muscles. Your own muscle picks always win.
+- **Weekly muscle map.** The 3D model shows this week's sets per muscle against a goal of 2.
+  Grey means still to train. A 2-week date strip, week arrows, swipe and a month calendar let you look back. Future days are locked.
+- **Weekly routine + Up next queue.** Plan exercises per weekday. Today's appear as a queue; tap one to log it.
+- **Rest timer.** Ring countdown with presets, ±15s, auto-start after each set, and a beep and vibration when rest is over.
+- Foldable set list per exercise.
+
 ## How the coaching works
 
 | Goal          | Rep range | Target RIR |

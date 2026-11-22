@@ -69,7 +69,7 @@ input:focus { outline: none; border-color: var(--text); }
 .dateLabel { flex: 1; text-align: center; display: flex; flex-direction: column; user-select: none; }
 .dateLabel strong { font-size: 1.1rem; }
 .dateLabel small { color: var(--muted); font-size: .8rem; }
-.dayScroll { flex: 1; overflow-y: auto; padding: 12px 14px 16px; }
+.dayScroll { flex: 1; overflow-y: auto; padding: 12px 14px 72px; } /* room for the timer bar */
 .slide-l { animation: slideL .25s ease-out; }
 .slide-r { animation: slideR .25s ease-out; }
 @keyframes slideL { from { transform: translateX(40px); opacity: 0; } }
@@ -86,10 +86,54 @@ input:focus { outline: none; border-color: var(--text); }
 .muscleList.center { justify-content: center; }
 .mchip { background: var(--field); border: 1px solid var(--line); border-radius: var(--r); padding: 4px 10px; font-size: .82rem; }
 .mchip.done { border-color: #ef4444; }
-.ex { margin-top: 14px; border-top: 1px solid var(--line); padding-top: 10px; }
-h4 { margin: 0 0 4px; font-size: 1rem; }
-h4 small { color: var(--muted); font-weight: 400; margin-left: 6px; }
+/* foldable exercise groups: centered name, set count below */
+.ex { margin-top: 8px; background: var(--field); }
+.exHead { width: 100%; background: transparent; padding: 10px 12px; flex-direction: column; gap: 2px; }
+.exHead strong { font-size: 1rem; }
+.exHead small { color: var(--muted); font-size: .8rem; }
+.exHead::after {
+  content: ""; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted);
+  transform: rotate(45deg); margin-top: 2px; transition: transform .2s;
+}
+.ex.open .exHead::after { transform: rotate(-135deg); margin-top: 6px; }
+.ex ol { display: none; padding: 0 12px 8px; }
+.ex.open ol { display: block; }
+.fireTag { font-size: .75rem; letter-spacing: -2px; margin-left: 4px; }
+.dayHead { text-align: center; font-size: .95rem; margin: 18px 0 4px; color: var(--muted); font-weight: 400; }
+.todo { color: var(--muted); font-size: .8rem; margin: 8px 0 0; }
 ol { list-style: none; margin: 0; padding: 0; }
+
+/* track row + queue */
+.trackRow { display: flex; gap: 8px; flex: none; }
+.trackRow .track { flex: 1; }
+.squareBtn { width: 60px; flex: none; background: var(--card); border: 1px solid var(--line-strong); padding: 0; }
+.queue { flex: none; margin-top: 12px; }
+.queueHead { display: flex; justify-content: space-between; align-items: baseline; font-size: .8rem; color: var(--muted); margin-bottom: 6px; }
+.queueRow { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
+.queueRow::-webkit-scrollbar { display: none; }
+.qchip {
+  flex: none; flex-direction: column; align-items: flex-start; gap: 2px; padding: 8px 12px;
+  background: var(--card); border: 1px solid var(--line-strong); max-width: 180px;
+}
+.qchip b { font-size: .9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 156px; }
+.qchip small { color: var(--muted); font-size: .75rem; }
+.qchip.done { opacity: .45; }
+.empty.small { font-size: .85rem; margin: 4px 0; }
+
+/* 2-week date strip */
+.biweek { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; padding: 8px 10px; border-bottom: 1px solid var(--line); flex: none; }
+.biweek .dow { text-align: center; font-size: .65rem; color: var(--muted); }
+.bday {
+  height: 34px; background: transparent; border: 1px solid transparent; padding: 0;
+  flex-direction: column; gap: 2px; font-size: .85rem; color: var(--muted);
+}
+.bday i { width: 4px; height: 4px; background: transparent; }
+.bday.has i { background: var(--text); }
+.bday.inweek { background: var(--field); color: var(--text); }
+.bday.today { border-color: var(--line-strong); }
+.bday.sel { background: var(--text); color: var(--ink); font-weight: 700; }
+.bday.sel i { background: var(--ink); }
+.bday:disabled { opacity: .25; }
 li { display: flex; align-items: center; gap: 10px; padding: 6px 0; }
 .setno {
   width: 24px; height: 24px; background: var(--line); border-radius: var(--r);
@@ -224,6 +268,77 @@ li { display: flex; align-items: center; gap: 10px; padding: 6px 0; }
 .nextCard .label { color: var(--muted); font-size: .75rem; text-transform: uppercase; letter-spacing: .05em; }
 .nextCard .big { font-size: 1.6rem; font-weight: 700; }
 .step.done .muscleList { margin-bottom: 18px; }
+
+/* fire rating */
+.fires { display: flex; justify-content: center; gap: 6px; margin: 30px 0 10px; }
+.fires.bump { animation: bump .25s ease-out; }
+.fires button { width: 58px; height: 70px; background: transparent; padding: 0; color: #3a3a3a; transition: color .2s, transform .15s; }
+.fires button svg { width: 52px; height: 52px; }
+.fires button:active { transform: scale(.9); }
+.fires button.lit { color: #fb923c; filter: drop-shadow(0 0 8px rgba(251, 146, 60, .6)); }
+[data-fire="4"] .fires button.lit { color: #f97316; }
+[data-fire="5"] .fires button.lit { color: #ef4444; filter: drop-shadow(0 0 12px rgba(239, 68, 68, .8)); animation: flicker 1s ease-in-out infinite alternate; }
+@keyframes flicker { to { transform: translateY(-2px) scale(1.05); } }
+.fireLabel { text-align: center; font-size: 1.6rem; font-weight: 700; margin: 10px 0 4px; }
+
+/* rest timer */
+.timerSheet {
+  background: var(--bg); display: flex; flex-direction: column; align-items: center;
+  padding: env(safe-area-inset-top) 20px calc(20px + env(safe-area-inset-bottom)); overflow-y: auto;
+}
+.timerSheet .wizTop { width: 100%; max-width: 520px; }
+.sheetTitle { font-weight: 700; font-size: 1.1rem; }
+.ringWrap { position: relative; width: min(78vw, 300px); aspect-ratio: 1; margin: 10px 0 18px; flex: none; }
+.bigRing { width: 100%; height: 100%; transform: rotate(-90deg); }
+.ringBg { fill: none; stroke: var(--line); stroke-width: 10; }
+.ringFg { fill: none; stroke: var(--text); stroke-width: 10; transition: stroke .3s; }
+#bigRing { stroke-dasharray: 628.32; stroke-dashoffset: 628.32; }
+#miniRing { stroke-dasharray: 100.53; stroke-dashoffset: 100.53; }
+.timerBar .ringBg, .timerBar .ringFg { stroke-width: 5; }
+.timerBar svg { transform: rotate(-90deg); }
+.ringText { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 0 30px; }
+.ringText strong { font-size: 3.6rem; font-variant-numeric: tabular-nums; }
+.ringText span { color: var(--muted); font-size: .95rem; }
+.ringDone .ringFg { stroke: var(--accent); }
+.ringDone .ringWrap { animation: pulse 1s ease-in-out infinite; }
+.ringDone .ringText span { color: var(--accent); }
+.timerAdj { display: flex; align-items: center; gap: 16px; }
+.timerAdj span { font-size: 1.3rem; font-weight: 700; min-width: 60px; text-align: center; font-variant-numeric: tabular-nums; }
+.presets { display: flex; gap: 6px; margin: 16px 0 10px; flex-wrap: wrap; justify-content: center; }
+.presets button { background: var(--card); border: 1px solid var(--line-strong); padding: 8px 12px; color: var(--muted); }
+.presets button.on { background: var(--text); color: var(--ink); border-color: var(--text); }
+.toggle { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: .9rem; margin: 6px 0 16px; }
+.toggle input { width: 18px; height: 18px; accent-color: #f2f2f2; }
+.timerActions { width: 100%; max-width: 520px; }
+.timerBar {
+  position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(16px + env(safe-area-inset-bottom));
+  z-index: 10; background: var(--text); color: var(--ink); padding: 8px 16px 8px 10px; gap: 10px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, .5); font-weight: 700; font-variant-numeric: tabular-nums;
+}
+.timerBar .ringBg { stroke: #cfcfcf; }
+.timerBar .ringFg { stroke: var(--ink); }
+.timerBar small { color: #555; font-weight: 400; }
+.timerBar.ringDone { background: var(--accent); }
+.timerBar.ringDone .ringFg { stroke: var(--ink); }
+.restCard {
+  width: 100%; margin-top: 10px; background: var(--card); border: 1px solid var(--line-strong);
+  padding: 12px; font-variant-numeric: tabular-nums;
+}
+.restCard.ringDone { border-color: var(--accent); color: var(--accent); }
+
+/* routine sheet */
+.sheetInner.tall { max-height: 88dvh; overflow-y: auto; }
+.dayTabs { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; margin-bottom: 12px; }
+.dayTabs button { background: var(--field); border: 1px solid var(--line); padding: 8px 0; font-size: .8rem; flex-direction: column; gap: 2px; color: var(--muted); }
+.dayTabs button.on { background: var(--text); color: var(--ink); border-color: var(--text); font-weight: 700; }
+.dayTabs em { font-style: normal; font-size: .65rem; }
+.routineList { min-height: 60px; }
+.rrow { display: flex; align-items: center; gap: 6px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+.rname { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rsets { font-size: .8rem; color: var(--muted); min-width: 44px; text-align: center; }
+.mini { width: 30px; height: 30px; padding: 0; background: var(--field); border: 1px solid var(--line-strong); }
+.addRow { display: flex; gap: 8px; margin-top: 12px; }
+.primary.small { width: auto; padding: 10px 16px; font-size: 1rem; margin: 0; }
 
 /* calendar sheet */
 .sheet { background: rgba(0, 0, 0, .6); display: flex; align-items: flex-end; justify-content: center; }
